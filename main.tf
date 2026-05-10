@@ -52,7 +52,7 @@ resource "aws_security_group" "sg"{
 
 resource "aws_instance" "ubuntu"{
     ami = "ami-091138d0f0d41ff90"
-    instance_type = "t3.large"
+    instance_type = "t3.medium"
     subnet_id = aws_subnet.public.id
     vpc_security_group_ids = [aws_security_group.sg.id]
     associate_public_ip_address = true
