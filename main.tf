@@ -57,7 +57,7 @@ resource "aws_instance" "ubuntu"{
     vpc_security_group_ids = [aws_security_group.sg.id]
     associate_public_ip_address = true
     tags = {
-        Name = "ubuntu-devops"
+        Name = "ubuntu-devops-v2"
     }
     key_name = aws_key_pair.devops.key_name
 }
