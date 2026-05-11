@@ -59,12 +59,7 @@ resource "aws_instance" "ubuntu"{
     tags = {
         Name = "ubuntu-devops-v3"
     }
-    key_name = aws_key_pair.devops.key_name
+    key_name = "devops-key"
 }
 
-resource "aws_key_pair" "devops" {
-    key_name = "devops-key"
-    // public_key = file("~/.ssh/devops-key.pub")
-    public_key = file("${path.module}/devops-key.pub")
-    //
-}
+
