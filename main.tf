@@ -60,6 +60,13 @@ resource "aws_instance" "ubuntu"{
         Name = "ubuntu-devops-t3.large"
     }
     key_name = "devops-key"
+    user_data = <<-EOF
+#!/bin/bash
+apt update -y
+apt install nginx -y
+systemctl start nginx
+systemctl enable nginx
+EOF
 }
 
 
