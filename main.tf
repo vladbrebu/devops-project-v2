@@ -67,6 +67,9 @@ apt update -y
 apt install nginx -y
 systemctl start nginx
 systemctl enable nginx
+cat <<EOT > /var/www/html/index.html
+<h1>Salut din Terraform + Nginx 🚀</h1>
+EOT
 EOF
 }
 
