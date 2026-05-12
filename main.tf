@@ -62,14 +62,98 @@ resource "aws_instance" "ubuntu"{
     key_name = "devops-key"
     user_data = <<-EOF
 #!/bin/bash
+
 apt update -y
-apt install nginx -y
+apt install -y nginx wget tar curl software-properties-common
+
+########################
+# NGINX
+########################
 systemctl start nginx
 systemctl enable nginx
+
 cat <<EOT > /var/www/html/index.html
-<h1>Salut din Terraform + Nginx 🚀</h1>
+<h1>Salut din Terraform + DevOps Stack 🚀</h1>
 EOT
+
+########################
+# NODE EXPORTER
+########################
+useradd -rs /bin/false node_exporter
+
+cd /opt
+wget 
+https://github.com/prometheus/node_exporter/releases/latest/download/node_exporter-*.linux-amd64.tar.gz
+tar xvf node_exporter-*.linux-amd64.tar.gz
+mv node_exporter-* node_exporter
+
+cat <<EOT > /etc/systemd/system/node_exporter.service
+[Unit]
+Description=Node Exporter
+After=network.target
+
+[Service]
+User=node_exporter
+ExecStart=/opt/node_exporter/node_exporter
+
+[Install]
+WantedBy=default.target
+EOT
+
+systemctl daemon-reload
+systemctl enable node_exporter
+systemctl start node_exporter
+
+########################
+# PROMETHEUS
+########################
+useradd -rs /bin/false prometheus
+
+cd /opt
+wget 
+https://github.com/prometheus/prometheus/releases/latest/download/prometheus-*.linux-amd64.tar.gz
+tar xvf prometheus-*.linux-amd64.tar.gz
+mv prometheus-* prometheus
+
+cat <<EOT > /etc/prometheus.yml
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: "node"
+    static_configs:
+      - targets: ["localhost:9100"]
+EOT
+
+cat <<EOT > /etc/systemd/system/prometheus.service
+[Unit]
+Description=Prometheus
+After=network.target
+
+[Service]
+User=prometheus
+ExecStart=/opt/prometheus/prometheus --config.file=/etc/prometheus.yml
+
+[Install]
+WantedBy=default.target
+EOT
+
+systemctl daemon-reload
+systemctl enable prometheus
+systemctl start prometheus
+
+########################
+# GRAFANA
+########################
+wget -q -O - https://packages.grafana.com/gpg.key | apt-key add -
+add-apt-repository "deb https://packages.grafana.com/oss/deb stable main"
+
+apt update -y
+apt install -y grafana
+
+systemctl enable grafana-server
+systemctl start grafana-server
+
 EOF
 }
-
 
